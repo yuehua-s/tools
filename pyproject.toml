@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "tools"
+version = "0.1.0"
+description = ""
+authors = ["yuehuazhang <yuehuazhang@tencent.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.11,<3.13"
+fitz = "^0.0.1.dev2"
+python-docx = "^1.1.2"
+markdown = "^3.7"
+frontend = "^0.0.3"
+rich = "^13.9.4"
+pymupdf = "^1.25.1"
+datasets = "^3.2.0"
+langchain-core = "^0.3.25"
+langchain-community = "^0.3.11"
+langchain-openai = "0.2.9"
+pandas = "^2.2.3"
+openpyxl = "^3.1.5"
+langchain-unstructured = "^0.1.6"
+unstructured = {extras = ["pdf"], version = "^0.16.11"}
+libmagic = "^1.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
