@@ -152,9 +152,9 @@ if __name__ == '__main__':
     # LLM API 密钥
     openai_api_key = "EMPTY"
     # 数据文件切片大小
-    chunk_size = 2048
+    chunk_size = 4096
     # 数据文件切片重叠大小
-    chunk_overlap = 512
+    chunk_overlap = 768
 
     # 获取当前时间并格式化为字符串
     current_time = datetime.now().strftime("%Y%m%d_%H%M%S")
