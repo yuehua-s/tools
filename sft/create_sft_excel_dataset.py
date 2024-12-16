@@ -1,9 +1,9 @@
 import os
-import rich
+import pytz
 import pandas as pd
 
-from typing import List
 from tqdm import tqdm
+from typing import List
 from datetime import datetime
 from pydantic import BaseModel, Field
 
@@ -87,33 +87,66 @@ def create_chain(model_name: str, temperature: float, max_tokens: int, openai_ap
     return chain
 
 
+# 将数据保存到 Excel 文件
+def save_to_excel_with_filename(data, output_directory, filename):
+    try:
+        df = pd.DataFrame(data)
+        output_file = os.path.join(output_directory, f"{filename}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx")
+        with pd.ExcelWriter(output_file, engine='openpyxl') as writer:
+            df.to_excel(writer, index=False)
+
+        # 获取当前北京时间并打印日志
+        beijing_tz = pytz.timezone('Asia/Shanghai')
+        current_time = datetime.now(beijing_tz).strftime("%Y-%m-%d %H:%M:%S")
+        print(f"\n ✅ Data successfully written to {output_file} at {current_time} (Beijing Time)")
+
+    except Exception as e:
+        print(f"\n ❌ Error saving to Excel: {e}")
+
+
+# 将所有 Excel 文件的内容汇总到一个 Excel 文件中
+def consolidate_excels_to_excel(output_directory, final_output_dataset):
+    try:
+        all_data = []
+        for file in os.listdir(output_directory):
+            if file.endswith('.xlsx') and not file.startswith('sft_dataset_'):
+                file_path = os.path.join(output_directory, file)
+                df = pd.read_excel(file_path)
+                all_data.append(df)
+
+        final_df = pd.concat(all_data, ignore_index=True)
+        with pd.ExcelWriter(final_output_dataset, engine='openpyxl') as writer:
+            final_df.to_excel(writer, index=False)
+
+        print(f"\n ✅ Data successfully consolidated to {final_output_dataset}")
+    except Exception as e:
+        print(f"\n ❌ Error consolidating to Excel: {e}")
+
+
 # 处理输入目录中的文件
-def process_files(input_directory, chain, chunk_size: int, chunk_overlap: int):
+def process_files(input_directory, chain, chunk_size: int, chunk_overlap: int, output_directory: str):
     data = []
     for root, dirs, files in os.walk(input_directory):
         for filename in files:
             if filename.startswith('.'):
                 continue  # 跳过以点开头的文件
             file_path = os.path.join(root, filename)
-            print("Processing file: {}".format(file_path))
+            print(f"\n 🚀 Start Process file: {file_path}")
             try:
                 documents = split_document(file_path, chunk_size=chunk_size, chunk_overlap=chunk_overlap)
             except Exception as e:
-                print(f"Error processing file {file_path}: {e}")
+                print(f"\nError processing file {file_path}: {e}")
                 continue  # 跳过到下一个文件
 
             if not documents:
-                print(f"No documents found in {file_path}")
+                print(f"\nNo documents found in {file_path}")
                 continue  # 如果没有文档，跳过
 
             bar = tqdm(total=len(documents))
             for doc in documents:
-                # print(f"\nProcessing document: {doc}")  # debug
                 bar.update(1)
                 try:
                     out = chain.invoke({'text': doc.page_content})
-                    print("")
-                    rich.print(out)
                     if isinstance(out, QaPairs):  # 检查输出类型
                         for qa_pair in out.qas:
                             data.append({
@@ -121,27 +154,20 @@ def process_files(input_directory, chain, chunk_size: int, chunk_overlap: int):
                                 'output': qa_pair.output,
                             })
                     else:
-                        print(f"Unexpected output format for document: {doc.page_content}")
+                        print(f"\nUnexpected output format for document: {doc.page_content}")
                 except Exception as e:
-                    print(f"Error processing output for document: {doc.page_content}, error: {e}")
+                    print(f"\nError processing output for document: {doc.page_content}, error: {e}")
+            save_to_excel_with_filename(data, output_directory, filename)
+            data = []  # 清空数据列表
             bar.close()
     return data
-
-
-# 将数据保存到 Excel 文件
-def save_to_excel(data, output_dataset):
-    try:
-        df = pd.DataFrame(data)
-        df.to_excel(output_dataset, index=False, engine='openpyxl')
-    except Exception as e:
-        print(f"Error saving to Excel: {e}")
 
 
 if __name__ == '__main__':
     # 数据输入目录
     input_directory = "/Users/zhangyuehua/Desktop/TKE文档"
     # 数据集输出目录
-    output_directory = "/Users/zhangyuehua/Desktop/"
+    output_directory = "/Users/zhangyuehua/Desktop/dataset"
     # LLM 模型名称
     model_name = "Qwen2.5-72B-Instruct"
     # LLM temperature 参数
@@ -158,7 +184,7 @@ if __name__ == '__main__':
 
     # 获取当前时间并格式化为字符串
     current_time = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_dataset = os.path.join(output_directory, f"sft_dataset_{current_time}.xlsx")
+    final_output_dataset = os.path.join(output_directory, f"sft_dataset_{current_time}.xlsx")
 
     chain = create_chain(model_name=model_name,
                          temperature=temperature,
@@ -167,9 +193,9 @@ if __name__ == '__main__':
                          openai_api_key=openai_api_key)
 
     # 处理文件并获取数据
-    data = process_files(input_directory, chain, chunk_size=chunk_size, chunk_overlap=chunk_overlap)
+    data = process_files(input_directory, chain, chunk_size=chunk_size, chunk_overlap=chunk_overlap, output_directory=output_directory)
 
-    # 保存数据到 Excel
-    save_to_excel(data, output_dataset)
+    # 将所有 Excel 文件的内容汇总到一个最终的 Excel 文件中
+    consolidate_excels_to_excel(output_directory, final_output_dataset)
 
     print("Done!")
