@@ -18,6 +18,7 @@ def shuffle_excel_rows(input_file, output_file):
         print(f"发生错误: {e}")
 
 
+# 将 Excel 文件按照行随机打乱
 if __name__ == "__main__":
     # 在这里定义输入文件和输出文件路径
     input_file = '/Users/zhangyuehua/Desktop/tke_doc_sft_dataset_clean_20241219_expand.xlsx'
