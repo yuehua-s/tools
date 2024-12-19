@@ -37,6 +37,7 @@ def convert_excel_to_alpaca_format(excel_path, output_path):
     print(f" ✅ 转换完成，数据已保存到{output_path}")
 
 
+# 把 Excel 数据集转换成 Alpaca 格式
 if __name__ == '__main__':
     # 数据输入文件
     input_dataset = "/Users/zhangyuehua/Desktop/tke_sft_dataset_202412.xlsx"

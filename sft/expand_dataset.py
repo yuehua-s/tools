@@ -95,7 +95,7 @@ def process_excel(input_excel_path: str, output_excel_path: str, chain):
         print(f"\n ❌ Error processing Excel: {e}")
 
 
-# 根据要求扩写指令
+# 根据要求扩写 Excel 中的指令
 if __name__ == '__main__':
     # 输入Excel文件路径
     input_excel_path = "/Users/zhangyuehua/Desktop/tke_doc_sft_dataset_clean_20241219.xlsx"
