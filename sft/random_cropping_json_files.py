@@ -67,6 +67,7 @@ def select_random_entries(input_file, output_file, N, format_type):
         print(f"发生错误: {e}")
 
 
+# 按要求（数据量）随机对 Json 数据集进行裁剪
 if __name__ == "__main__":
     # 在这里定义输入文件、输出文件、选择的数量和数据格式
     # input_file = '/Users/zhangyuehua/Desktop/alpaca_gpt4_data_zh.json'

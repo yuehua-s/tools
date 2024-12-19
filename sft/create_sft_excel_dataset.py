@@ -163,6 +163,7 @@ def process_files(input_directory, chain, chunk_size: int, chunk_overlap: int, o
     return data
 
 
+# 用 LLM 读取文档，并输出 Excel 数据集
 if __name__ == '__main__':
     # 数据输入目录
     input_directory = "/Users/zhangyuehua/Desktop/TKE文档"
