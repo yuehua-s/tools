@@ -21,8 +21,8 @@ def shuffle_excel_rows(input_file, output_file):
 # 将 Excel 文件按照行随机打乱
 if __name__ == "__main__":
     # 在这里定义输入文件和输出文件路径
-    input_file = '/Users/zhangyuehua/Desktop/tke_doc_sft_dataset_clean_20241219_expand.xlsx'
-    output_file = '/Users/zhangyuehua/Desktop/tke_doc_sft_dataset_clean_20241219_expand_finally.xlsx'
+    input_file = '/Users/zhangyuehua/Desktop/tke_doc_sft_dataset_clean_20241226_expand.xlsx'
+    output_file = '/Users/zhangyuehua/Desktop/tke_doc_sft_dataset_clean_20241226_expand_random.xlsx'
 
     shuffle_excel_rows(input_file, output_file)
     print("Done!")
